@@ -24,3 +24,10 @@ Route::prefix('auth')->middleware('api')->group(function (){
     Route::post('refresh', 'AuthController@refresh');
     Route::post('me', 'AuthController@me');
 });
+
+Route::prefix('user')->group(function (){
+    Route::get('/{user}','UserController@index');
+    Route::post('register', 'UserController@register');
+    Route::patch('/', 'UserController@updateUserInfo');
+    Route::post('/avatar/upload', 'UserController@uploadAvatar');
+});

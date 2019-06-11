@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Storage;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -35,17 +36,64 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereUpdatedAt($value)
  * @mixin \Eloquent
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Collection[] $following_collections
+ * @property string $username
+ * @property string $avatar
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Post[] $bookmarked_posts
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Post[] $liked_posts
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereAvatar($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereUsername($value)
  */
 class User extends Authenticatable implements JWTSubject
 {
+    /*
+     * path to save user avatar
+     */
+    const AVATAR_PATH = "public".DIRECTORY_SEPARATOR."user".DIRECTORY_SEPARATOR."avatar";
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'email', 'password', 'first_name', 'last_name',
+        'username', 'password', 'email', 'first_name', 'last_name',
     ];
+
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'password', 'created_at', 'updated_at'
+    ];
+
+    /**
+     * Get the route key for the model.
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return 'username';
+    }
+
+    /**
+     * Crypt the password
+     *
+     * @param $value
+     */
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = bcrypt($value);
+    }
+
+    public function getAvatarAttribute($value)
+    {
+        $avatar_url = self::AVATAR_PATH.'/'.$value;
+
+        return Storage::url($avatar_url);
+    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
@@ -119,7 +167,10 @@ class User extends Authenticatable implements JWTSubject
      */
     public function syncAvatar(string $avatar)
     {
-        // TODO: implement syncing Avatar
+        $this->avatar = $avatar;
+        $this->save();
+
+        return $this;
     }
 
     /**
