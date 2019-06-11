@@ -2,43 +2,78 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\User;
 
 class UserSociabilityController extends Controller
 {
     /**
-     * Handle the incoming request to follow a user by current authenticated user.
+     * Create a new UserSociabilityController instance.
      *
-     * @param int $user
+     * @return void
      */
-    public function follow(int $user)
+    public function __construct()
     {
-        // TODO: implement following a user by current authenticated user.
+        $this->middleware('auth:api', ['only' => ['follow']]);
     }
 
+
     /**
-     * Handle the incoming request to unfollow a user by current authenticated user.
+     * Handle the incoming request to follow & unfollow a user by current authenticated user.
      *
      * @param int $user
      */
-    public function unfollow(int $user)
+    public function follow(int $leader)
     {
-        // TODO: implement unfollowing a user by current authenticated user.
+        $user = auth()->user();
+
+        try {
+            $result = $user->followings()->toggle($leader);
+            if($result['attached']) {
+                $message = 'successfully_followed';
+            }
+            elseif ($result['detached']) {
+                $message = 'successfully_unfollowed';
+            }
+
+        } catch (\Exception $exception){
+            $message = 'failed';
+        }
+
+        $responseData = [
+            'message' => $message,
+        ];
+
+        return response()->json($responseData, 200);
     }
 
     /**
      * Retrieve current authenticated user followers
      */
-    public function followers()
+    public function followers(User $user)
     {
-        // TODO: implement Retrieve current authenticated user followers action
+        $followers = $user->followers;
+
+        $responseData = [
+            'message' => 'successfully_retrieved',
+            'data' => $followers
+        ];
+
+        return response()->json($responseData, 200);
+
     }
 
     /**
      * Retrieve current authenticated user followings
      */
-    public function following()
+    public function following(User $user)
     {
-        // TODO: implement Retrieve current authenticated user followings action
+        $followings = $user->followings;
+
+        $responseData = [
+            'message' => 'successfully_retrieved',
+            'data' => $followings
+        ];
+
+        return response()->json($responseData, 200);
     }
 }

@@ -28,6 +28,10 @@ Route::prefix('auth')->middleware('api')->group(function (){
 Route::prefix('user')->group(function (){
     Route::get('/collections', 'UserCollectionController@followedCollections');
 
+    Route::get('/{user}/follow','UserSociabilityController@follow');
+    Route::get('/{user}/followers','UserSociabilityController@followers');
+    Route::get('/{user}/followings','UserSociabilityController@following');
+
     Route::get('/{user}','UserController@index');
     Route::post('register', 'UserController@register');
     Route::patch('/', 'UserController@updateUserInfo');
