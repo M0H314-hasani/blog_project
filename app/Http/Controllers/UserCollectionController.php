@@ -2,18 +2,52 @@
 
 namespace App\Http\Controllers;
 
+use App\Collection;
 use Illuminate\Http\Request;
 
 class UserCollectionController extends Controller
 {
     /**
+     * Create a new UserController instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
+    /**
      * Handle the incoming request to follow a collection by current authenticated user.
      *
      * @param int $collection
      */
-    public function followCollection(int $collection)
+    public function followCollection(Collection $collection)
     {
-        // TODO: implement follow a collection by current authenticated user action
+        $user = auth()->user();
+
+        try {
+            $result = $user->following_collections()->toggle($collection->id);
+            if($result['attached']) {
+                $message = 'successfully_followed';
+                $collection->followers ++;
+            }
+            elseif ($result['detached']) {
+                $message = 'successfully_unfollowed';
+                $collection->followers --;
+            }
+
+            $collection->save();
+
+        } catch (\Exception $exception){
+            $message = 'failed';
+        }
+
+        $responseData = [
+            'message' => $message,
+        ];
+
+        return response()->json($responseData, 200);
     }
 
     /**
@@ -21,6 +55,15 @@ class UserCollectionController extends Controller
      */
     public function followedCollections()
     {
-        // TODO: implement retrieving all collection which followed by current authenticated user.
+        $user = auth()->user();
+
+        $userCollections = $user->following_collections;
+
+        $responseData = [
+            'message' => 'successfully_retrieve',
+            'data' =>$userCollections
+        ];
+
+        return response()->json($responseData, 200);
     }
 }

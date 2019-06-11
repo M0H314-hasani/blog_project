@@ -26,10 +26,14 @@ Route::prefix('auth')->middleware('api')->group(function (){
 });
 
 Route::prefix('user')->group(function (){
+    Route::get('/collections', 'UserCollectionController@followedCollections');
+
     Route::get('/{user}','UserController@index');
     Route::post('register', 'UserController@register');
     Route::patch('/', 'UserController@updateUserInfo');
     Route::post('/avatar/upload', 'UserController@uploadAvatar');
+
+
 });
 
 Route::prefix('collection')->group(function (){
@@ -38,4 +42,5 @@ Route::prefix('collection')->group(function (){
     Route::post('/', 'CollectionController@create');
     Route::delete('/{collection}', 'CollectionController@destroy');
 
+    Route::get('/{collection}/follow', 'UserCollectionController@followCollection');
 });
