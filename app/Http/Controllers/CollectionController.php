@@ -4,15 +4,35 @@ namespace App\Http\Controllers;
 
 use App\Collection;
 use Illuminate\Http\Request;
+use Str;
+
 
 class CollectionController extends Controller
 {
+    /**
+     * Create a new UserController instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['except' => ['create', 'destroy']]);
+        $this->middleware('can:delete,collection', ['only' => ['destroy']]);
+    }
+
     /**
      * Retrieve all collections.
      */
     public function index()
     {
-        // TODO: implement retrieve all collections action.
+        $collections = Collection::all();
+
+        $responseData = [
+            'message' => 'successfully_retrieved',
+            'data' => $collections
+        ];
+
+        return response()->json($responseData, 201);
     }
 
     /**
@@ -22,7 +42,29 @@ class CollectionController extends Controller
      */
     public function create(Request $request)
     {
-        // TODO: implement creation of collection by current authenticated user
+        $user = auth()->user();
+
+        $request->validate([
+            'name' => 'required|min:3|unique:collections',
+            'subtitle' => 'required|max:255',
+            'slug' => 'required|min:3|unique:collections',
+        ]);
+
+        $collection = new Collection();
+            $collection->user_id = $user->id;
+            $collection->name = $request->name;
+            $collection->subtitle = $request->subtitle;
+            $collection->slug = Str::slug($request->slug, '-');
+        $collection->save();
+
+        $responseData = [
+            'message' => 'successfully_created',
+            'data' => $collection
+        ];
+
+        return response()->json($responseData, 201);
+
+
     }
 
     /**
@@ -34,6 +76,16 @@ class CollectionController extends Controller
      */
     public function destroy(Collection $collection)
     {
-        // TODO: implement destroying a collection
+        if ($collection->posts->count())
+            $status = false;
+        else
+            $status = $collection->delete();
+
+        $responseData = [
+            'message' => $status ? 'successfully_deleted' : 'failed_to_delete',
+        ];
+
+        return response()->json($responseData, 200);
+
     }
 }

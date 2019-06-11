@@ -16,7 +16,6 @@ class CreateCollectionsTable extends Migration
         Schema::create('collections', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id');
-            $table->text('featured_image_path');
             $table->string('name')->unique();
             $table->string('subtitle');
             $table->string('slug')->unique();

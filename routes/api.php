@@ -31,3 +31,11 @@ Route::prefix('user')->group(function (){
     Route::patch('/', 'UserController@updateUserInfo');
     Route::post('/avatar/upload', 'UserController@uploadAvatar');
 });
+
+Route::prefix('collection')->group(function (){
+
+    Route::get('/', 'CollectionController@index');
+    Route::post('/', 'CollectionController@create');
+    Route::delete('/{collection}', 'CollectionController@destroy');
+
+});
