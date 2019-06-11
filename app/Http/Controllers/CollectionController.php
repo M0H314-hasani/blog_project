@@ -16,7 +16,7 @@ class CollectionController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['create', 'destroy']]);
+        $this->middleware('auth:api', ['except' => ['index']]);
         $this->middleware('can:delete,collection', ['only' => ['destroy']]);
     }
 
