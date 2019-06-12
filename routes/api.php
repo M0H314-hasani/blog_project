@@ -41,10 +41,20 @@ Route::prefix('user')->group(function (){
 });
 
 Route::prefix('collection')->group(function (){
-
     Route::get('/', 'CollectionController@index');
     Route::post('/', 'CollectionController@create');
     Route::delete('/{collection}', 'CollectionController@destroy');
 
     Route::get('/{collection}/follow', 'UserCollectionController@followCollection');
+});
+
+Route::prefix('post')->group(function (){
+    Route::get('/', 'PostController@index');
+    Route::post('/', 'PostController@create');
+    Route::get('/{post}/related/{quantity}', 'PostController@relatedPosts');
+    Route::post('/{post}/featured-image/upload', 'PostController@uploadFeaturedImage');
+    Route::patch('/{post}/status', 'PostController@changeStatus');
+    Route::patch('/{post}/accessibility', 'PostController@changeAccessibility');
+    Route::patch('/{post}', 'PostController@update');
+    Route::get('/{post}', 'PostController@show');
 });

@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Storage;
 
 
 /**
@@ -45,10 +46,69 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Post whereUserId($value)
  * @mixin \Eloquent
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Post whereAccessibility($value)
+ * @property string $featured_image
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\User[] $bookmarked_by
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\User[] $liked_by
+ * @method static bool|null forceDelete()
+ * @method static \Illuminate\Database\Query\Builder|\App\Post onlyTrashed()
+ * @method static bool|null restore()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Post whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Post whereFeaturedImage($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Post withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|\App\Post withoutTrashed()
  */
 class Post extends Model
 {
     use SoftDeletes;
+
+    /*
+     * path to save post featured image
+     */
+    const FEATURED_IMAGE_PATH = "public".DIRECTORY_SEPARATOR."post".DIRECTORY_SEPARATOR."featured_image";
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'collection_id', 'title', 'subtitle', 'content', 'slug',
+    ];
+
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'created_at', 'updated_at'
+    ];
+
+    /**
+     * Retrieve the model for a bound value.
+     *
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function resolveRouteBinding($value)
+    {
+        return $this->where('id', $value)->orWhere('slug', $value)->first() ?? abort(404);
+    }
+
+    /**
+     * Accessor for featured image.
+     * Return url path for featured image
+     *
+     * @param $value
+     * @return mixed
+     */
+    public function getFeaturedImageAttribute($value)
+    {
+        $featured_image_url = self::FEATURED_IMAGE_PATH.'/'.$value;
+
+        return Storage::url($featured_image_url);
+    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -96,8 +156,11 @@ class Post extends Model
      *
      * @param string $featuredImage
      */
-    public function syncAvatar(string $featuredImage)
+    public function syncFeaturedImage(string $featuredImage)
     {
-        // TODO: implement syncing featuredImage
+        $this->featured_image = $featuredImage;
+        $this->save();
+
+        return $this;
     }
 }
