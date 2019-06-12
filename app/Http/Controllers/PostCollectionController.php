@@ -3,18 +3,41 @@
 namespace App\Http\Controllers;
 
 use App\Collection;
+use App\Post;
 use Illuminate\Http\Request;
 
 class PostCollectionController extends Controller
 {
     /**
+     * Create a new PostCollectionController instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['only' => ['retrieveUserCollectionsOriented']]);
+    }
+
+    /**
      * Get all posts that there are in the specific collection.
      *
-     * @param Collection $collection
+     * @param int $collection
      */
-    public function retrieveCollectionOriented(Collection $collection)
+    public function retrieveCollectionOriented(int $collection)
     {
-        // TODO: implement retrieving posts by collection oriented
+        $posts = Post::whereIn('status', ['Published', 'Scheduled'])
+            ->where('accessibility', 'Public')
+            ->where('collection_id', $collection)
+            ->whereRaw("IF (`status` = 'Scheduled', `published_at` < now(), `status` = 'Published')")
+            ->orderBy('updated_at', 'desc')
+            ->paginate(10);
+
+        $responseData = [
+            'message' => 'successfully_retrieved',
+            'data' => $posts
+        ];
+
+        return response()->json($responseData, 200);
     }
 
     /**
@@ -23,6 +46,21 @@ class PostCollectionController extends Controller
      */
     public function retrieveUserCollectionsOriented()
     {
-        // TODO: implement retrieving posts by collections of authenticated user
+        $user = auth()->user();
+        $collections_ids = $user->following_collections->pluck('id')->toArray();
+
+        $posts = Post::whereIn('status', ['Published', 'Scheduled'])
+            ->where('accessibility', 'Public')
+            ->whereIn('collection_id', $collections_ids)
+            ->whereRaw("IF (`status` = 'Scheduled', `published_at` < now(), `status` = 'Published')")
+            ->orderBy('updated_at', 'desc')
+            ->paginate(10);
+
+        $responseData = [
+            'message' => 'successfully_retrieved',
+            'data' => $posts
+        ];
+
+        return response()->json($responseData, 200);
     }
 }

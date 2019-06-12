@@ -28,6 +28,8 @@ Route::prefix('auth')->middleware('api')->group(function (){
 Route::prefix('user')->group(function (){
     Route::get('/collections', 'UserCollectionController@followedCollections');
 
+    Route::get('/collections/posts', 'PostCollectionController@retrieveUserCollectionsOriented');
+
     Route::get('/{user}/follow','UserSociabilityController@follow');
     Route::get('/{user}/followers','UserSociabilityController@followers');
     Route::get('/{user}/followings','UserSociabilityController@following');
@@ -36,13 +38,14 @@ Route::prefix('user')->group(function (){
     Route::post('register', 'UserController@register');
     Route::patch('/', 'UserController@updateUserInfo');
     Route::post('/avatar/upload', 'UserController@uploadAvatar');
-
-
 });
 
 Route::prefix('collection')->group(function (){
     Route::get('/', 'CollectionController@index');
     Route::post('/', 'CollectionController@create');
+
+    Route::get('/{collection}/posts', 'PostCollectionController@retrieveCollectionOriented');
+
     Route::delete('/{collection}', 'CollectionController@destroy');
 
     Route::get('/{collection}/follow', 'UserCollectionController@followCollection');
