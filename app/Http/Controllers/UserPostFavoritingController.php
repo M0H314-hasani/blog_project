@@ -23,14 +23,42 @@ class UserPostFavoritingController extends Controller
      */
     public function likePost(int $post)
     {
-        // TODO: implementation of like & dislike action
+        $user = auth()->user();
+
+        try {
+            $result = $user->liked_posts()->toggle($post);
+            if($result['attached']) {
+                $message = 'successfully_liked';
+            }
+            elseif ($result['detached']) {
+                $message = 'successfully_disliked';
+            }
+
+        } catch (\Exception $exception) {
+            $message = 'failed';
+        }
+
+        $responseData = [
+            'message' => $message,
+        ];
+
+        return response()->json($responseData, 200);
     }
 
     /**
-     * Retrieve bookmarked post of current authenticated user.
+     * Retrieve liked post of current authenticated user.
      */
     public function likedPosts()
     {
-        // TODO: implementation of retrieved liked post by current authenticated user
+        $user = auth()->user();
+
+        $likedPosts = $user->liked_posts;
+
+        $responseData = [
+            'message' => 'successfully_retrieve',
+            'data' =>$likedPosts
+        ];
+
+        return response()->json($responseData, 200);
     }
 }

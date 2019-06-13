@@ -28,6 +28,8 @@ Route::prefix('auth')->middleware('api')->group(function (){
 Route::prefix('user')->group(function (){
     Route::get('/post/bookmarks', 'UserBookmarkingController@bookmarkedPosts');
 
+    Route::get('/post/likes', 'UserPostFavoritingController@likedPosts');
+
     Route::get('/collections', 'UserCollectionController@followedCollections');
 
     Route::get('/collections/posts', 'PostCollectionController@retrieveUserCollectionsOriented');
@@ -58,6 +60,8 @@ Route::prefix('post')->group(function (){
     Route::post('/', 'PostController@create');
 
     Route::get('/{post}/bookmark', 'UserBookmarkingController@bookmarkPost');
+
+    Route::get('/{post}/like', 'UserPostFavoritingController@likePost');
 
     Route::get('/{post}/related/{quantity}', 'PostController@relatedPosts');
     Route::post('/{post}/featured-image/upload', 'PostController@uploadFeaturedImage');
