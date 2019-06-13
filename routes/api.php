@@ -26,6 +26,8 @@ Route::prefix('auth')->middleware('api')->group(function (){
 });
 
 Route::prefix('user')->group(function (){
+    Route::get('/post/bookmarks', 'UserBookmarkingController@bookmarkedPosts');
+
     Route::get('/collections', 'UserCollectionController@followedCollections');
 
     Route::get('/collections/posts', 'PostCollectionController@retrieveUserCollectionsOriented');
@@ -54,6 +56,9 @@ Route::prefix('collection')->group(function (){
 Route::prefix('post')->group(function (){
     Route::get('/', 'PostController@index');
     Route::post('/', 'PostController@create');
+
+    Route::get('/{post}/bookmark', 'UserBookmarkingController@bookmarkPost');
+
     Route::get('/{post}/related/{quantity}', 'PostController@relatedPosts');
     Route::post('/{post}/featured-image/upload', 'PostController@uploadFeaturedImage');
     Route::patch('/{post}/status', 'PostController@changeStatus');

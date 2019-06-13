@@ -8,20 +8,58 @@ use Illuminate\Http\Request;
 class UserBookmarkingController extends Controller
 {
     /**
+     * Create a new UserBookmarkingController instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
+    /**
      * Add a post to bookmark list for the current authenticated user.
      *
      * @param int $post
      */
     public function bookmarkPost(int $post)
     {
-        // TODO: implement Add a post to bookmark list for the current authenticated user
+        $user = auth()->user();
+
+        try {
+            $result = $user->bookmarked_posts()->toggle($post);
+            if($result['attached']) {
+                $message = 'successfully_bookmarked';
+            }
+            elseif ($result['detached']) {
+                $message = 'successfully_remove_from_bookmark';
+            }
+
+        } catch (\Exception $exception) {
+            $message = 'failed';
+        }
+
+        $responseData = [
+            'message' => $message,
+        ];
+
+        return response()->json($responseData, 200);
     }
 
     /**
      * Retrieve bookmarked post of current authenticated user.
      */
-    public function bookmarkedPosts(User $user)
+    public function bookmarkedPosts()
     {
-        // TODO: implement retrieve bookmarked post of current authenticated user
+        $user = auth()->user();
+
+        $bookmarkedPosts = $user->bookmarked_posts;
+
+        $responseData = [
+            'message' => 'successfully_retrieve',
+            'data' =>$bookmarkedPosts
+        ];
+
+        return response()->json($responseData, 200);
     }
 }
