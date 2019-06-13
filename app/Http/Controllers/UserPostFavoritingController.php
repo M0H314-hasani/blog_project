@@ -52,7 +52,7 @@ class UserPostFavoritingController extends Controller
     {
         $user = auth()->user();
 
-        $likedPosts = $user->liked_posts;
+        $likedPosts = $user->liked_posts->pluck('id');
 
         $responseData = [
             'message' => 'successfully_retrieve',
