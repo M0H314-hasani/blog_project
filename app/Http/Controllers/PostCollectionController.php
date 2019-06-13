@@ -33,6 +33,8 @@ class PostCollectionController extends Controller
             ->orderBy('updated_at', 'desc')
             ->paginate(10);
 
+        $posts->data = PostsBriefResource::collection($posts);
+
         $responseData = [
             'message' => 'successfully_retrieved',
             'data' => $posts
