@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Post;
-use Illuminate\Http\Request;
+use App\Http\Resources\PostsBriefResource;
 
 class UserBookmarkingController extends Controller
 {
@@ -53,7 +52,7 @@ class UserBookmarkingController extends Controller
     {
         $user = auth()->user();
 
-        $bookmarkedPosts = $user->bookmarked_posts;
+        $bookmarkedPosts = PostsBriefResource::collection($user->bookmarked_posts);
 
         $responseData = [
             'message' => 'successfully_retrieve',
