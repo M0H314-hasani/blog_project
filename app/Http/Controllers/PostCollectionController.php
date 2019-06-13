@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Collection;
+use App\Http\Resources\PostsBriefResource;
 use App\Post;
 use Illuminate\Http\Request;
 
@@ -55,6 +56,8 @@ class PostCollectionController extends Controller
             ->whereRaw("IF (`status` = 'Scheduled', `published_at` < now(), `status` = 'Published')")
             ->orderBy('updated_at', 'desc')
             ->paginate(10);
+
+        $posts->data = PostsBriefResource::collection($posts);
 
         $responseData = [
             'message' => 'successfully_retrieved',
