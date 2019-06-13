@@ -18,6 +18,23 @@ class UserCollectionController extends Controller
     }
 
     /**
+     * Retrieve all collections that created by current authenticated user.
+     */
+    public function userCollections()
+    {
+        $user = auth()->user();
+
+        $collections = $user->collections;
+
+        $responseData = [
+            'message' => 'successfully_retrieve',
+            'data' =>$collections
+        ];
+
+        return response()->json($responseData, 200);
+    }
+
+    /**
      * Handle the incoming request to follow a collection by current authenticated user.
      *
      * @param int $collection

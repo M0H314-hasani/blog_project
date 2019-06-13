@@ -30,9 +30,11 @@ Route::prefix('user')->group(function (){
 
     Route::get('/post/likes', 'UserPostFavoritingController@likedPosts');
 
-    Route::get('/collections', 'UserCollectionController@followedCollections');
+    Route::get('/collections/followed', 'UserCollectionController@followedCollections');
 
-    Route::get('/collections/posts', 'PostCollectionController@retrieveUserCollectionsOriented');
+    Route::get('/collections/followed/posts', 'PostCollectionController@retrieveUserCollectionsOriented');
+
+    Route::get('/collections', 'UserCollectionController@userCollections');
 
     Route::get('/{user}/follow','UserSociabilityController@follow');
     Route::get('/{user}/followers','UserSociabilityController@followers');
