@@ -45,6 +45,18 @@ class AuthController extends Controller
     }
 
     /**
+     * retrieve token.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function token()
+    {
+        $token = (string) auth()->getToken();
+
+        return response()->json(['access_token' => $token]);
+    }
+
+    /**
      * Refresh a token.
      *
      * @return \Illuminate\Http\JsonResponse
