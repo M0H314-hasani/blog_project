@@ -36,6 +36,8 @@ Route::prefix('user')->group(function (){
 
     Route::get('/collections', 'UserCollectionController@userCollections');
 
+    Route::get('/posts', 'UserPostController@userPosts');
+
     Route::get('/{user}/follow','UserSociabilityController@follow');
     Route::get('/{user}/followers','UserSociabilityController@followers');
     Route::get('/{user}/followings','UserSociabilityController@following');
