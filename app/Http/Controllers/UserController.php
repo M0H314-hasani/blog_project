@@ -39,9 +39,9 @@ class UserController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'username' => 'required|min:5',
+            'username' => 'required|min:5|unique:users',
             'password' => 'required|min:8',
-            'email' => 'required|email',
+            'email' => 'required|email|unique:users',
             'first_name' => 'required|min:3',
             'last_name' => 'required|min:3',
         ]);
@@ -73,6 +73,14 @@ class UserController extends Controller
     public function updateUserInfo(Request $request)
     {
         $user = auth()->user();
+
+        $request->validate([
+            'username' => "required|min:5|unique:users,username,$user->id",
+            'password' => 'required|min:8',
+            'email' => "required|email|unique:users,username,$user->id",
+            'first_name' => 'required|min:3',
+            'last_name' => 'required|min:3',
+        ]);
 
         $user->update($request->all());
 

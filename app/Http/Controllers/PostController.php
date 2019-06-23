@@ -134,6 +134,7 @@ class PostController extends Controller
 
                     // Change status of post
                     $post->status = "Published";
+                    $post->published_at = (string) now();
                     $post->save();
 
                     $message = 'successfully_published';
